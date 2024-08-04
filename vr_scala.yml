@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: mongodb24
+    ports:
+      - "27017:27017"
+    volumes:
+      - /home/Docker/Volumes/MongoDB:/data/db
+    networks:
+      - mongo-compose-network
+ 
+  express-app:
+    image: ghcr.io/romulospl/vr_scala:v1
+    environment:
+      - DB_CONNECTION_STRING=mongodb://root:mongodb24@mongo:27017/vr?authSource=admin
+    ports:
+      - "3000:3000"
+    networks:
+      - mongo-compose-network
+
+  nginx:
+    image: ghcr.io/romulospl/vr_scala_nginx:v1
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - mongo-compose-network
+
+networks: 
+  mongo-compose-network:
+    driver: bridge
